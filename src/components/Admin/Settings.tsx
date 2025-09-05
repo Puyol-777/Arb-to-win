@@ -228,7 +228,7 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
     <div className="space-y-6">
       <h3 className="text-xl font-bold">Paramètres</h3>
 
-      <div className="bg-white p-6 rounded-lg shadow border space-y-6">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border space-y-6">
         <h4 className="text-lg font-semibold">Limites de jeu</h4>
         
         <div className="space-y-4">
@@ -273,7 +273,7 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow border space-y-4">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border space-y-4">
         <h4 className="text-lg font-semibold">Configuration Google</h4>
         
         <div>
@@ -293,7 +293,7 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow border">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border">
         <div className="flex justify-between items-center mb-4">
           <h4 className="text-lg font-semibold">Mentions légales</h4>
           <button
@@ -312,7 +312,7 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow border">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border">
         <div className="flex justify-between items-center mb-4">
           <h4 className="text-lg font-semibold">Règles du jeu</h4>
           <button
@@ -331,12 +331,12 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow border">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border">
         <div className="flex justify-between items-center mb-4">
           <h4 className="text-lg font-semibold">Boutons d'actions généraux</h4>
           <button
             onClick={() => setEditingButtons(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+            className="btn-primary"
           >
             Gérer les boutons généraux
           </button>
@@ -347,11 +347,8 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
             <div key={button.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
               <div className="flex items-center space-x-3">
                 <button
-                  style={{
-                    backgroundColor: button.backgroundColor,
-                    color: button.color
-                  }}
-                  className="px-4 py-2 rounded font-medium"
+                  style={{ '--btn-bg': button.backgroundColor, '--btn-color': button.color }}
+                  className="px-4 py-2 rounded font-medium bg-[var(--btn-bg)] text-[var(--btn-color)]"
                   disabled
                 >
                   {button.text}
@@ -366,12 +363,12 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow border">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border">
         <div className="flex justify-between items-center mb-4">
           <h4 className="text-lg font-semibold">Page Félicitations - Boutons d'actions</h4>
           <button
             onClick={() => setEditingButtons(true)}
-            className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
+            className="btn-primary"
           >
             Gérer les boutons félicitations
           </button>
@@ -388,11 +385,8 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
             <div key={button.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
               <div className="flex items-center space-x-3">
                 <button
-                  style={{
-                    backgroundColor: button.backgroundColor,
-                    color: button.color
-                  }}
-                  className="px-4 py-2 rounded font-medium"
+                  style={{ '--btn-bg': button.backgroundColor, '--btn-color': button.color }}
+                  className="px-4 py-2 rounded font-medium bg-[var(--btn-bg)] text-[var(--btn-color)]"
                   disabled
                 >
                   {button.text}
@@ -417,12 +411,12 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
           ))}
         </div>
       </div>
-      <div className="bg-white p-6 rounded-lg shadow border">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border">
         <div className="flex justify-between items-center mb-4">
           <h4 className="text-lg font-semibold">Textes de l'application</h4>
           <button
             onClick={() => setEditingTexts(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+            className="btn-primary"
           >
             Modifier les textes
           </button>
@@ -431,12 +425,12 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <span className="font-medium">Titre de la page de jeu:</span>
-            <p 
-              className="text-gray-600"
-              style={{ 
-                fontFamily: texts.titleFont,
-                fontSize: `${texts.titleSize}px`,
-                color: texts.titleColor
+            <p
+              className="text-gray-600 font-[var(--title-font)] text-[length:var(--title-size)] text-[var(--title-color)]"
+              style={{
+                '--title-font': texts.titleFont,
+                '--title-size': `${texts.titleSize}px`,
+                '--title-color': texts.titleColor
               }}
             >
               {texts.title}
@@ -444,12 +438,12 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
           </div>
           <div>
             <span className="font-medium">Sous-titre:</span>
-            <p 
-              className="text-gray-600"
-              style={{ 
-                fontFamily: texts.subtitleFont,
-                fontSize: `${texts.subtitleSize}px`,
-                color: texts.subtitleColor
+            <p
+              className="text-gray-600 font-[var(--subtitle-font)] text-[length:var(--subtitle-size)] text-[var(--subtitle-color)]"
+              style={{
+                '--subtitle-font': texts.subtitleFont,
+                '--subtitle-size': `${texts.subtitleSize}px`,
+                '--subtitle-color': texts.subtitleColor
               }}
             >
               {texts.subtitle}
@@ -457,12 +451,12 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
           </div>
           <div>
             <span className="font-medium">Bouton tourner:</span>
-            <p 
-              className="text-gray-600"
-              style={{ 
-                fontFamily: texts.spinButtonFont,
-                fontSize: `${texts.spinButtonSize}px`,
-                color: texts.spinButtonColor
+            <p
+              className="text-gray-600 font-[var(--spin-font)] text-[length:var(--spin-size)] text-[var(--spin-color)]"
+              style={{
+                '--spin-font': texts.spinButtonFont,
+                '--spin-size': `${texts.spinButtonSize}px`,
+                '--spin-color': texts.spinButtonColor
               }}
             >
               {texts.spinButton}
@@ -470,12 +464,12 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
           </div>
           <div>
             <span className="font-medium">Félicitations:</span>
-            <p 
-              className="text-gray-600"
-              style={{ 
-                fontFamily: texts.congratulationsFont,
-                fontSize: `${texts.congratulationsSize}px`,
-                color: texts.congratulationsColor
+            <p
+              className="text-gray-600 font-[var(--congrats-font)] text-[length:var(--congrats-size)] text-[var(--congrats-color)]"
+              style={{
+                '--congrats-font': texts.congratulationsFont,
+                '--congrats-size': `${texts.congratulationsSize}px`,
+                '--congrats-color': texts.congratulationsColor
               }}
             >
               {texts.congratulations}
@@ -486,7 +480,7 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
 
       {editingTexts && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <h4 className="text-lg font-semibold mb-4">Modifier les textes</h4>
             
             <div className="space-y-4">
@@ -711,7 +705,7 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
 
       {editingLegal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <h4 className="text-lg font-semibold mb-4">Modifier les mentions légales</h4>
             
             <div className="space-y-4">
@@ -767,7 +761,7 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
 
       {editingRules && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <h4 className="text-lg font-semibold mb-4">Modifier les règles du jeu</h4>
             
             <div className="space-y-4">
@@ -823,7 +817,7 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
 
       {editingButtons && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h4 className="text-lg font-semibold">Gérer les boutons d'actions - Page Félicitations</h4>
               <button
@@ -940,11 +934,8 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-gray-700">Aperçu du bouton :</span>
                       <button
-                        style={{
-                          backgroundColor: button.backgroundColor,
-                          color: button.color
-                        }}
-                        className="px-4 py-2 rounded font-medium shadow-sm"
+                        style={{ '--btn-bg': button.backgroundColor, '--btn-color': button.color }}
+                        className="px-4 py-2 rounded font-medium shadow-sm bg-[var(--btn-bg)] text-[var(--btn-color)]"
                         disabled
                       >
                         {button.text}
