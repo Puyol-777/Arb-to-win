@@ -210,12 +210,11 @@ export function getStoredConfig(): AppConfig {
         },
         stats: {
           ...defaultConfig.stats,
-          ...config.stats
-        },
-        stats: {
-          ...defaultConfig.stats,
           ...config.stats,
-          dailyHistory: config.stats?.dailyHistory || []
+          dailyHistory: [
+            ...(defaultConfig.stats?.dailyHistory || []),
+            ...(config.stats?.dailyHistory || [])
+          ]
         }
       };
       
