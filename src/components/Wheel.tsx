@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { WheelCanvas } from './WheelCanvas';
 import { useWheel } from '../hooks/useWheel';
 import { Prize, AppTexts, GameSettings } from '../types';
@@ -16,8 +16,18 @@ const antiCheat = new AntiCheatSystem();
 
 export function Wheel({ prizes, texts, gameSettings, onResult, onStatsUpdate }: WheelProps) {
   const { isSpinning, rotation, spin } = useWheel(prizes);
-  const [message, setMessage] = useState<string>('');
-  const [canPlay, setCanPlay] = useState(true);
+  const [message, setMessageState] = useState<string>('');
+  const messageRef = useRef(message);
+  const setMessage = (value: string) => {
+    messageRef.current = value;
+    setMessageState(value);
+  };
+  const [canPlay, setCanPlayState] = useState(true);
+  const canPlayRef = useRef(canPlay);
+  const setCanPlay = (value: boolean) => {
+    canPlayRef.current = value;
+    setCanPlayState(value);
+  };
   const [configVersion, setConfigVersion] = useState(0);
 
   // Surveiller les changements de configuration
@@ -25,13 +35,13 @@ export function Wheel({ prizes, texts, gameSettings, onResult, onStatsUpdate }: 
     const checkConfigUpdates = () => {
       console.log('🎯 Wheel: Checking config updates');
       setConfigVersion(prev => prev + 1);
-      
+
       // Vérifier si on peut encore jouer après une mise à jour
       const playCheck = antiCheat.canPlay(gameSettings.playLimit);
       if (!playCheck.allowed && playCheck.reason) {
         setMessage(playCheck.reason);
         setCanPlay(false);
-      } else if (playCheck.allowed && !canPlay && !message.includes('erreur')) {
+      } else if (playCheck.allowed && !canPlayRef.current && !messageRef.current.includes('erreur')) {
         setMessage('');
         setCanPlay(true);
       }
@@ -55,7 +65,7 @@ export function Wheel({ prizes, texts, gameSettings, onResult, onStatsUpdate }: 
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('focus', checkConfigUpdates);
     window.addEventListener('visibilitychange', checkConfigUpdates);
-    
+
     return () => {
       window.removeEventListener('configUpdated', checkConfigUpdates);
       window.removeEventListener('forceConfigReload', checkConfigUpdates);
@@ -64,7 +74,7 @@ export function Wheel({ prizes, texts, gameSettings, onResult, onStatsUpdate }: 
       window.removeEventListener('focus', checkConfigUpdates);
       window.removeEventListener('visibilitychange', checkConfigUpdates);
     };
-  }, [gameSettings.playLimit, canPlay, message]);
+  }, [gameSettings.playLimit]);
 
   const handleSpin = async () => {
     const playCheck = antiCheat.canPlay(gameSettings.playLimit);
