@@ -28,8 +28,7 @@ export class AntiCheatSystem {
     return deviceId;
   }
   
-  canPlay(playLimit: 'once' | 'daily'): { allowed: boolean; reason?: string } {
-  }
+  canPlay(playLimit: 'once' | 'daily'): { allowed: boolean; reason?: string };
   canPlay(playLimit: 'once' | 'daily' | 'unlimited'): { allowed: boolean; reason?: string } {
     if (playLimit === 'unlimited') {
       return { allowed: true };
