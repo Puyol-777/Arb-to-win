@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AppConfig } from '../../types';
 import { cloudSync } from '../../utils/cloudSync';
 import { StatsManager } from '../../utils/statsManager';
+import logger from '../../utils/logger';
 import { GainsManagement } from './GainsManagement';
 import { ThemeManagement } from './ThemeManagement';
 import { Statistics } from './Statistics';
@@ -35,7 +36,7 @@ export function Dashboard({ config, onUpdateConfig, onLogout }: DashboardProps) 
         // Forcer la synchronisation cloud
         cloudSync.saveToCloud(newConfig).then(success => {
           if (success) {
-            console.log('☁️ Modifications synchronisées sur tous les appareils');
+            logger.log('☁️ Modifications synchronisées sur tous les appareils');
           }
         });
         
@@ -60,35 +61,35 @@ export function Dashboard({ config, onUpdateConfig, onLogout }: DashboardProps) 
         }, 3000);
       }, 500);
       
-    } catch (error) {
-      setSaving(false);
-      alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
-    }
-  };
+      } catch {
+        setSaving(false);
+        alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
+      }
+    };
 
-  const handleUpdatePrizes = (prizes: any[]) => {
-    handleUpdateConfig({ prizes });
-  };
+    const handleUpdatePrizes = (prizes: unknown[]) => {
+      handleUpdateConfig({ prizes });
+    };
 
-  const handleUpdateThemes = (themes: any[]) => {
-    handleUpdateConfig({ themes });
-  };
+    const handleUpdateThemes = (themes: unknown[]) => {
+      handleUpdateConfig({ themes });
+    };
 
-  const handleSetActiveTheme = (activeTheme: string) => {
-    handleUpdateConfig({ activeTheme });
-  };
+    const handleSetActiveTheme = (activeTheme: string) => {
+      handleUpdateConfig({ activeTheme });
+    };
 
-  const handleUpdateSettings = (gameSettings: any) => {
-    console.log('🔧 Dashboard - Mise à jour settings:', gameSettings);
-    handleUpdateConfig({ gameSettings });
-  };
+    const handleUpdateSettings = (gameSettings: unknown) => {
+      logger.log('🔧 Dashboard - Mise à jour settings:', gameSettings);
+      handleUpdateConfig({ gameSettings });
+    };
 
-  const handleUpdateTexts = (texts: any) => {
-    console.log('🔧 Dashboard - Mise à jour texts:', {
-      actionButtons: texts.actionButtons?.map(btn => ({ id: btn.id, url: btn.url }))
-    });
-    handleUpdateConfig({ texts });
-  };
+    const handleUpdateTexts = (texts: unknown) => {
+      logger.log('🔧 Dashboard - Mise à jour texts:', {
+        actionButtons: (texts as { actionButtons?: { id: string; url: string }[] }).actionButtons?.map(btn => ({ id: btn.id, url: btn.url }))
+      });
+      handleUpdateConfig({ texts });
+    };
 
   const handleResetStats = () => {
     const newStats = statsManager.resetStats(config.stats);

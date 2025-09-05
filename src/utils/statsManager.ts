@@ -1,5 +1,6 @@
 import { GameStats, DailyStats } from '../types';
-import { format, subDays, parseISO, isAfter, isBefore } from 'date-fns';
+import { format, subDays, parseISO, isAfter } from 'date-fns';
+import logger from './logger';
 
 export class StatsManager {
   private static instance: StatsManager;
@@ -104,8 +105,8 @@ export class StatsManager {
       isAfter(parseISO(day.date), startDate)
     );
 
-    console.log('📊 Filtered data:', filteredData);
-    console.log('📊 Period:', period, 'GroupBy:', groupBy, 'DateFormat:', dateFormat);
+    logger.log('📊 Filtered data:', filteredData);
+    logger.log('📊 Period:', period, 'GroupBy:', groupBy, 'DateFormat:', dateFormat);
     
     // Si pas de données, créer des données par défaut pour affichage
     if (filteredData.length === 0) {

@@ -1,4 +1,5 @@
 import { generateDeviceFingerprint, hashWithSalt } from './deviceFingerprint';
+import logger from './logger';
 
 const STORAGE_KEYS = {
   LAST_PLAY: 'roue_last_play',
@@ -28,9 +29,7 @@ export class AntiCheatSystem {
     return deviceId;
   }
   
-  canPlay(playLimit: 'once' | 'daily'): { allowed: boolean; reason?: string } {
-  }
-  canPlay(playLimit: 'once' | 'daily' | 'unlimited'): { allowed: boolean; reason?: string } {
+    canPlay(playLimit: 'once' | 'daily' | 'unlimited'): { allowed: boolean; reason?: string } {
     if (playLimit === 'unlimited') {
       return { allowed: true };
     }
@@ -77,9 +76,9 @@ export class AntiCheatSystem {
     });
   }
   
-  private async logToServer(data: any): Promise<void> {
+    private async logToServer(data: Record<string, unknown>): Promise<void> {
     // In a real implementation, this would send to your backend
-    console.log('Logging play to server:', data);
+    logger.log('Logging play to server:', data);
   }
   
   resetDevice(): void {

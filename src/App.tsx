@@ -11,12 +11,13 @@ import { getStoredConfig, saveConfig } from './utils/config';
 import { cloudSync } from './utils/cloudSync';
 import { StatsManager } from './utils/statsManager';
 import { AppConfig, Prize } from './types';
+import logger from './utils/logger';
 
 type ViewType = 'game' | 'rules' | 'legal' | 'admin';
 
 function App() {
   const [config, setConfig] = useState<AppConfig>(getStoredConfig());
-  const [configVersion, setConfigVersion] = useState(0);
+  const [, setConfigVersion] = useState(0);
   const [currentView, setCurrentView] = useState<ViewType>('game');
   const [menuOpen, setMenuOpen] = useState(false);
   const [winningPrize, setWinningPrize] = useState<Prize | null>(null);
@@ -32,7 +33,7 @@ function App() {
   // Écouter les changements de configuration
   useEffect(() => {
     const handleConfigUpdate = () => {
-      console.log('🔄 Configuration update detected');
+      logger.log('🔄 Configuration update detected');
       const newConfig = getStoredConfig();
       setConfig(newConfig);
       setConfigVersion(prev => prev + 1);
@@ -45,39 +46,39 @@ function App() {
 
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'config_update_trigger' || e.key === 'last_config_update' || e.key === 'force_reload_trigger' || e.key === 'cloud_sync_trigger' || e.key?.startsWith('roue_config')) {
-        console.log('📱 Storage change detected:', e.key);
+        logger.log('📱 Storage change detected:', e.key);
         handleConfigUpdate();
       }
     };
 
     const handleCustomConfigUpdate = (e: CustomEvent) => {
-      console.log('🎯 Custom config update event:', e.detail?.source || 'local');
+      logger.log('🎯 Custom config update event:', e.detail?.source || 'local');
       handleConfigUpdate();
     };
 
     const handleForceReload = () => {
-      console.log('🔄 Force reload triggered');
+      logger.log('🔄 Force reload triggered');
       handleConfigUpdate();
     };
 
     const handleCloudSync = () => {
-      console.log('☁️ Cloud sync triggered');
+      logger.log('☁️ Cloud sync triggered');
       cloudSync.forcSync();
     };
 
-    const handleConfigChanged = (e: CustomEvent) => {
-      console.log('🔄 Config changed event triggered');
+    const handleConfigChanged = () => {
+      logger.log('🔄 Config changed event triggered');
       handleConfigUpdate();
     };
 
     // Vérifier périodiquement les changements (pour mobile)
-    const checkInterval = setInterval(() => {
-      const currentConfig = getStoredConfig();
-      const currentVersion = (currentConfig as any)._version || 0;
-      const appVersion = (config as any)._version || 0;
+      const checkInterval = setInterval(() => {
+        const currentConfig = getStoredConfig();
+        const currentVersion = (currentConfig as { _version?: number })._version || 0;
+        const appVersion = (config as { _version?: number })._version || 0;
       
       if (currentVersion > appVersion) {
-        console.log('🔄 Configuration mise à jour détectée, rechargement...');
+        logger.log('🔄 Configuration mise à jour détectée, rechargement...');
         handleConfigUpdate();
       }
     }, 500); // Vérifier plus fréquemment
@@ -127,7 +128,7 @@ function App() {
         [prize.label]: (newStats.prizeDistribution[prize.label] || 0) + 1
       };
       
-      console.log('📊 Updated stats after spin:', newStats);
+      logger.log('📊 Updated stats after spin:', newStats);
       setConfig(prev => ({ ...prev, stats: newStats }));
     }
   };
@@ -135,28 +136,28 @@ function App() {
   const handleStatsUpdate = (type: 'spin' | 'review') => {
     if (type === 'review') {
       const newStats = statsManager.updateDailyStats(config.stats, 'review');
-      console.log('📊 Updated stats after review:', newStats);
+      logger.log('📊 Updated stats after review:', newStats);
       setConfig(prev => ({ ...prev, stats: newStats }));
     }
   };
 
   const handleReviewClick = () => {
-    console.log('🎯 App - handleReviewClick - URL utilisée:', config.gameSettings.googleReviewUrl);
+    logger.log('🎯 App - handleReviewClick - URL utilisée:', config.gameSettings.googleReviewUrl);
     handleStatsUpdate('review');
     window.open(config.gameSettings.googleReviewUrl, '_blank');
   };
 
   const handleActionButtonClick = (url: string) => {
-    console.log('🎯 App - handleActionButtonClick - URL utilisée:', url);
+    logger.log('🎯 App - handleActionButtonClick - URL utilisée:', url);
     window.open(url, '_blank');
   };
 
   const handleUpdateConfig = (newConfig: AppConfig) => {
     try {
-      console.log('💾 Saving configuration...');
+      logger.log('💾 Saving configuration...');
       setConfig(newConfig);
       saveConfig(newConfig);
-      console.log('✅ Configuration saved successfully');
+      logger.log('✅ Configuration saved successfully');
       
       // Forcer la mise à jour immédiate
       setTimeout(() => {
@@ -164,7 +165,7 @@ function App() {
       }, 100);
       
     } catch (error) {
-      console.error('❌ Error saving configuration:', error);
+      logger.error('❌ Error saving configuration:', error);
       alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
     }
   };

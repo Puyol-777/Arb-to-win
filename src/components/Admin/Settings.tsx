@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GameSettings, AppTexts, ActionButton } from '../../types';
+import logger from '../../utils/logger';
 
 const AVAILABLE_FONTS = [
   { value: 'Arial', label: 'Arial' },
@@ -57,19 +58,19 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
   const [tempRulesContent, setTempRulesContent] = useState(texts.rulesContent);
   const [tempButtons, setTempButtons] = useState(texts.actionButtons);
 
-  const handleSettingChange = (key: keyof GameSettings, value: any) => {
-    console.log('🔧 Settings - Modification:', key, '=', value);
+    const handleSettingChange = (key: keyof GameSettings, value: unknown) => {
+    logger.log('🔧 Settings - Modification:', key, '=', value);
     onUpdateSettings({
       ...gameSettings,
       [key]: value
     });
   };
 
-  const handleSaveTexts = () => {
-    try {
-      console.log('💾 Saving texts...');
-      onUpdateTexts(tempTexts);
-      setEditingTexts(false);
+    const handleSaveTexts = () => {
+      try {
+        logger.log('💾 Saving texts...');
+        onUpdateTexts(tempTexts);
+        setEditingTexts(false);
       
       // Notification de succès avec style mobile-friendly
       const notification = document.createElement('div');
@@ -96,16 +97,16 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
         }
       }, 2000);
       
-    } catch (error) {
-      console.error('❌ Error saving texts:', error);
-      alert('Erreur lors de la sauvegarde des textes. Veuillez réessayer.');
-    }
-  };
+      } catch (error) {
+        logger.error('❌ Error saving texts:', error);
+        alert('Erreur lors de la sauvegarde des textes. Veuillez réessayer.');
+      }
+    };
 
-  const handleSaveLegal = () => {
-    try {
-      onUpdateTexts({ ...texts, legalContent: tempLegalContent });
-      setEditingLegal(false);
+    const handleSaveLegal = () => {
+      try {
+        onUpdateTexts({ ...texts, legalContent: tempLegalContent });
+        setEditingLegal(false);
       
       const notification = document.createElement('div');
       notification.innerHTML = '✅ Mentions légales synchronisées !';
@@ -130,15 +131,15 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
         }
       }, 2000);
       
-    } catch (error) {
-      alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
-    }
-  };
+      } catch {
+        alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
+      }
+    };
 
-  const handleSaveRules = () => {
-    try {
-      onUpdateTexts({ ...texts, rulesContent: tempRulesContent });
-      setEditingRules(false);
+    const handleSaveRules = () => {
+      try {
+        onUpdateTexts({ ...texts, rulesContent: tempRulesContent });
+        setEditingRules(false);
       
       const notification = document.createElement('div');
       notification.innerHTML = '✅ Règles synchronisées sur tous les appareils !';
@@ -163,16 +164,16 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
         }
       }, 2000);
       
-    } catch (error) {
-      alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
-    }
-  };
+      } catch {
+        alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
+      }
+    };
 
-  const handleSaveButtons = () => {
-    try {
-      console.log('💾 Sauvegarde boutons - URLs:', tempButtons.map(btn => ({ id: btn.id, url: btn.url })));
-      onUpdateTexts({ ...texts, actionButtons: tempButtons });
-      setEditingButtons(false);
+    const handleSaveButtons = () => {
+      try {
+        logger.log('💾 Sauvegarde boutons - URLs:', tempButtons.map(btn => ({ id: btn.id, url: btn.url })));
+        onUpdateTexts({ ...texts, actionButtons: tempButtons });
+        setEditingButtons(false);
       
       const notification = document.createElement('div');
       notification.innerHTML = '✅ Boutons synchronisés sur tous les appareils !';
@@ -197,10 +198,10 @@ export function Settings({ gameSettings, texts, onUpdateSettings, onUpdateTexts 
         }
       }, 2000);
       
-    } catch (error) {
-      alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
-    }
-  };
+      } catch {
+        alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
+      }
+    };
 
   const handleAddButton = () => {
     const newButton: ActionButton = {

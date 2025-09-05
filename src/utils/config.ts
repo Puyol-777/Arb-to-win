@@ -1,5 +1,6 @@
 import { AppConfig } from '../types';
 import { cloudSync } from './cloudSync';
+import logger from './logger';
 
 const defaultConfig: AppConfig = {
   prizes: [
@@ -188,7 +189,7 @@ export function getStoredConfig(): AppConfig {
     const stored = localStorage.getItem('roue_config');
     if (stored) {
       const config = JSON.parse(stored);
-      console.log('📖 Chargement config - URLs:', {
+      logger.log('📖 Chargement config - URLs:', {
         googleReviewUrl: config.gameSettings?.googleReviewUrl,
         actionButtons: config.texts?.actionButtons?.map(btn => ({ id: btn.id, url: btn.url }))
       });
@@ -208,18 +209,14 @@ export function getStoredConfig(): AppConfig {
           ...defaultConfig.gameSettings,
           ...config.gameSettings
         },
-        stats: {
-          ...defaultConfig.stats,
-          ...config.stats
-        },
-        stats: {
-          ...defaultConfig.stats,
-          ...config.stats,
-          dailyHistory: config.stats?.dailyHistory || []
-        }
+          stats: {
+            ...defaultConfig.stats,
+            ...config.stats,
+            dailyHistory: config.stats?.dailyHistory || []
+          }
       };
       
-      console.log('📖 Config finale - URLs:', {
+      logger.log('📖 Config finale - URLs:', {
         googleReviewUrl: mergedConfig.gameSettings.googleReviewUrl,
         actionButtons: mergedConfig.texts.actionButtons.map(btn => ({ id: btn.id, url: btn.url }))
       });
@@ -227,7 +224,7 @@ export function getStoredConfig(): AppConfig {
       return mergedConfig;
     }
   } catch (error) {
-    console.error('Error loading stored config:', error);
+    logger.error('Error loading stored config:', error);
   }
   return defaultConfig;
 }
@@ -235,7 +232,7 @@ export function getStoredConfig(): AppConfig {
 export function saveConfig(config: AppConfig): void {
   try {
     const timestamp = Date.now();
-    console.log('💾 Sauvegarde config - URLs:', {
+    logger.log('💾 Sauvegarde config - URLs:', {
       googleReviewUrl: config.gameSettings.googleReviewUrl,
       actionButtons: config.texts.actionButtons.map(btn => ({ id: btn.id, url: btn.url }))
     });
@@ -263,7 +260,7 @@ export function saveConfig(config: AppConfig): void {
     // Sauvegarder dans le cloud pour synchronisation multi-appareils
     cloudSync.saveToCloud(configWithVersion).then(success => {
       if (success) {
-        console.log('☁️ Configuration synchronisée sur tous les appareils');
+        logger.log('☁️ Configuration synchronisée sur tous les appareils');
       }
     });
     
@@ -289,7 +286,7 @@ export function saveConfig(config: AppConfig): void {
     }, 100);
     
   } catch (error) {
-    console.error('Error saving config:', error);
+    logger.error('Error saving config:', error);
     throw error; // Propager l'erreur pour que l'UI puisse la gérer
   }
 }

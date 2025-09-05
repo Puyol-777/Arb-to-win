@@ -3,6 +3,7 @@ import { WheelCanvas } from './WheelCanvas';
 import { useWheel } from '../hooks/useWheel';
 import { Prize, AppTexts, GameSettings } from '../types';
 import { AntiCheatSystem } from '../utils/antiCheat';
+import logger from '../utils/logger';
 
 interface WheelProps {
   prizes: Prize[];
@@ -18,12 +19,12 @@ export function Wheel({ prizes, texts, gameSettings, onResult, onStatsUpdate }: 
   const { isSpinning, rotation, spin } = useWheel(prizes);
   const [message, setMessage] = useState<string>('');
   const [canPlay, setCanPlay] = useState(true);
-  const [configVersion, setConfigVersion] = useState(0);
+  const [, setConfigVersion] = useState(0);
 
   // Surveiller les changements de configuration
   useEffect(() => {
     const checkConfigUpdates = () => {
-      console.log('🎯 Wheel: Checking config updates');
+      logger.log('🎯 Wheel: Checking config updates');
       setConfigVersion(prev => prev + 1);
       
       // Vérifier si on peut encore jouer après une mise à jour
@@ -39,13 +40,13 @@ export function Wheel({ prizes, texts, gameSettings, onResult, onStatsUpdate }: 
 
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'config_update_trigger' || e.key === 'last_config_update' || e.key === 'force_reload_trigger') {
-        console.log('🎯 Wheel: Storage change detected');
+        logger.log('🎯 Wheel: Storage change detected');
         checkConfigUpdates();
       }
     };
 
     const handleConfigChanged = () => {
-      console.log('🎯 Wheel: Config changed event');
+      logger.log('🎯 Wheel: Config changed event');
       checkConfigUpdates();
     };
 
@@ -81,19 +82,13 @@ export function Wheel({ prizes, texts, gameSettings, onResult, onStatsUpdate }: 
       onResult(result.prizeId);
       onStatsUpdate('spin');
       setCanPlay(false);
-    } catch (error) {
-      setMessage('Une erreur est survenue. Veuillez réessayer.');
-    }
-  };
-
-  const handleReviewClick = () => {
-    console.log('🎯 Wheel - handleReviewClick - URL utilisée:', gameSettings.googleReviewUrl);
-    onStatsUpdate('review');
-    window.open(gameSettings.googleReviewUrl, '_blank');
-  };
+      } catch {
+        setMessage('Une erreur est survenue. Veuillez réessayer.');
+      }
+    };
 
   const handleActionButtonClick = (url: string) => {
-    console.log('🎯 Wheel - handleActionButtonClick - URL utilisée:', url);
+    logger.log('🎯 Wheel - handleActionButtonClick - URL utilisée:', url);
     window.open(url, '_blank');
   };
 

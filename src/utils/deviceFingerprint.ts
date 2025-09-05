@@ -18,7 +18,7 @@ export function generateDeviceFingerprint(): string {
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     screen: `${screen.width}x${screen.height}x${screen.colorDepth}`,
     canvas: canvasHash.slice(-50), // Last 50 chars for brevity
-    memory: (navigator as any).deviceMemory || 'unknown',
+    memory: (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 'unknown',
     cores: navigator.hardwareConcurrency || 'unknown',
     touchSupport: 'ontouchstart' in window ? '1' : '0'
   };
