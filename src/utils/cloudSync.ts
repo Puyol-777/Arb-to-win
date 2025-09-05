@@ -152,7 +152,7 @@ export class CloudSyncManager {
   }
 
   // Méthode pour forcer une synchronisation
-  async forcSync(): Promise<void> {
+  async forceSync(): Promise<void> {
     console.log('🔄 Synchronisation forcée...');
     await this.syncFromCloud();
   }
