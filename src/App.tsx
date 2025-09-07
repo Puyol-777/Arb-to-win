@@ -62,7 +62,7 @@ function App() {
 
     const handleCloudSync = () => {
       console.log('☁️ Cloud sync triggered');
-      cloudSync.forcSync();
+      cloudSync.forceSync();
     };
 
     const handleConfigChanged = (e: CustomEvent) => {
