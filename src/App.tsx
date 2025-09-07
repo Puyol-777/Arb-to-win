@@ -7,16 +7,14 @@ import { PrizeModal } from './components/PrizeModal';
 import { Dashboard } from './components/Admin/Dashboard';
 import { Login } from './components/Admin/Login';
 import { useAuth } from './hooks/useAuth';
-import { getStoredConfig, saveConfig } from './utils/config';
-import { cloudSync } from './utils/cloudSync';
 import { StatsManager } from './utils/statsManager';
 import { AppConfig, Prize } from './types';
+import { useConfig } from './context/ConfigContext';
 
 type ViewType = 'game' | 'rules' | 'legal' | 'admin';
 
 function App() {
-  const [config, setConfig] = useState<AppConfig>(getStoredConfig());
-  const [configVersion, setConfigVersion] = useState(0);
+  const { config, updateConfig } = useConfig();
   const [currentView, setCurrentView] = useState<ViewType>('game');
   const [menuOpen, setMenuOpen] = useState(false);
   const [winningPrize, setWinningPrize] = useState<Prize | null>(null);
@@ -26,90 +24,13 @@ function App() {
   const activeTheme = config.themes.find(t => t.id === config.activeTheme);
 
   useEffect(() => {
-    saveConfig(config);
-  }, [config]);
-
-  // Écouter les changements de configuration
-  useEffect(() => {
-    const handleConfigUpdate = () => {
-      console.log('🔄 Configuration update detected');
-      const newConfig = getStoredConfig();
-      setConfig(newConfig);
-      setConfigVersion(prev => prev + 1);
-      
-      // Forcer le re-render des composants
-      setTimeout(() => {
-        setConfigVersion(prev => prev + 1);
-      }, 50);
-    };
-
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'config_update_trigger' || e.key === 'last_config_update' || e.key === 'force_reload_trigger' || e.key === 'cloud_sync_trigger' || e.key?.startsWith('roue_config')) {
-        console.log('📱 Storage change detected:', e.key);
-        handleConfigUpdate();
-      }
-    };
-
-    const handleCustomConfigUpdate = (e: CustomEvent) => {
-      console.log('🎯 Custom config update event:', e.detail?.source || 'local');
-      handleConfigUpdate();
-    };
-
-    const handleForceReload = () => {
-      console.log('🔄 Force reload triggered');
-      handleConfigUpdate();
-    };
-
-    const handleCloudSync = () => {
-      console.log('☁️ Cloud sync triggered');
-      cloudSync.forcSync();
-    };
-
-    const handleConfigChanged = (e: CustomEvent) => {
-      console.log('🔄 Config changed event triggered');
-      handleConfigUpdate();
-    };
-
-    // Vérifier périodiquement les changements (pour mobile)
-    const checkInterval = setInterval(() => {
-      const currentConfig = getStoredConfig();
-      const currentVersion = (currentConfig as any)._version || 0;
-      const appVersion = (config as any)._version || 0;
-      
-      if (currentVersion > appVersion) {
-        console.log('🔄 Configuration mise à jour détectée, rechargement...');
-        handleConfigUpdate();
-      }
-    }, 500); // Vérifier plus fréquemment
-
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('configUpdated', handleCustomConfigUpdate as EventListener);
-    window.addEventListener('forceConfigReload', handleForceReload);
-    window.addEventListener('cloudSyncTrigger', handleCloudSync);
-    window.addEventListener('configChanged', handleConfigChanged as EventListener);
-    window.addEventListener('focus', handleConfigUpdate); // Recharger au focus
-    window.addEventListener('visibilitychange', handleConfigUpdate); // Recharger quand l'onglet redevient visible
-    
-    return () => {
-      clearInterval(checkInterval);
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('configUpdated', handleCustomConfigUpdate as EventListener);
-      window.removeEventListener('forceConfigReload', handleForceReload);
-      window.removeEventListener('cloudSyncTrigger', handleCloudSync);
-      window.removeEventListener('configChanged', handleConfigChanged as EventListener);
-      window.removeEventListener('focus', handleConfigUpdate);
-      window.removeEventListener('visibilitychange', handleConfigUpdate);
-    };
-  }, [config]);
-
-  useEffect(() => {
     if (activeTheme) {
       document.documentElement.style.setProperty('--primary-color', activeTheme.primaryColor);
       document.documentElement.style.setProperty('--secondary-color', activeTheme.secondaryColor);
       document.documentElement.style.setProperty('--accent-color', activeTheme.accentColor);
       document.documentElement.style.setProperty('--bg-color', activeTheme.backgroundColor);
       document.documentElement.style.setProperty('--text-color', activeTheme.textColor);
-      
+
       document.body.style.backgroundColor = activeTheme.backgroundColor;
       document.body.style.color = activeTheme.textColor;
     }
@@ -119,24 +40,21 @@ function App() {
     const prize = config.prizes.find(p => p.id === prizeId);
     if (prize) {
       setWinningPrize(prize);
-      
-      // Update stats with daily tracking
+
       const newStats = statsManager.updateDailyStats(config.stats, 'spin');
       newStats.prizeDistribution = {
         ...newStats.prizeDistribution,
         [prize.label]: (newStats.prizeDistribution[prize.label] || 0) + 1
       };
-      
-      console.log('📊 Updated stats after spin:', newStats);
-      setConfig(prev => ({ ...prev, stats: newStats }));
+
+      updateConfig(prev => ({ ...prev, stats: newStats }));
     }
   };
 
   const handleStatsUpdate = (type: 'spin' | 'review') => {
     if (type === 'review') {
       const newStats = statsManager.updateDailyStats(config.stats, 'review');
-      console.log('📊 Updated stats after review:', newStats);
-      setConfig(prev => ({ ...prev, stats: newStats }));
+      updateConfig(prev => ({ ...prev, stats: newStats }));
     }
   };
 
@@ -154,15 +72,8 @@ function App() {
   const handleUpdateConfig = (newConfig: AppConfig) => {
     try {
       console.log('💾 Saving configuration...');
-      setConfig(newConfig);
-      saveConfig(newConfig);
+      updateConfig(newConfig);
       console.log('✅ Configuration saved successfully');
-      
-      // Forcer la mise à jour immédiate
-      setTimeout(() => {
-        setConfigVersion(prev => prev + 1);
-      }, 100);
-      
     } catch (error) {
       console.error('❌ Error saving configuration:', error);
       alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
@@ -214,7 +125,7 @@ function App() {
             >
               Arb' Aventure
             </button>
-            
+
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setCurrentView('admin')}
@@ -223,14 +134,14 @@ function App() {
               >
                 <SettingsIcon size={20} />
               </button>
-              
+
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="text-gray-600 hover:text-gray-800 md:hidden"
               >
                 {menuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
-              
+
               <nav className="hidden md:flex space-x-6">
                 {menuItems.map(item => (
                   <button
@@ -250,7 +161,7 @@ function App() {
             </div>
           </div>
         </div>
-        
+
         {/* Mobile Menu */}
         {menuOpen && (
           <div className="md:hidden bg-white border-t">
@@ -280,13 +191,7 @@ function App() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {currentView === 'game' && (
-          <Wheel
-            prizes={config.prizes}
-            texts={config.texts}
-            gameSettings={config.gameSettings}
-            onResult={handleResult}
-            onStatsUpdate={handleStatsUpdate}
-          />
+          <Wheel onResult={handleResult} onStatsUpdate={handleStatsUpdate} />
         )}
       </main>
 
@@ -334,17 +239,19 @@ function App() {
               >
                 Mentions légales
               </button>
-              {config.texts.actionButtons.filter(btn => btn.isActive && btn.id !== 'google-review').map(button => (
-                <React.Fragment key={button.id}>
-                  <span>•</span>
-                  <button
-                    onClick={() => handleActionButtonClick(button.url)}
-                    className="hover:text-gray-800"
-                  >
-                    {button.text}
-                  </button>
-                </React.Fragment>
-              ))}
+              {config.texts.actionButtons
+                .filter(btn => btn.isActive && btn.id !== 'google-review')
+                .map(button => (
+                  <React.Fragment key={button.id}>
+                    <span>•</span>
+                    <button
+                      onClick={() => handleActionButtonClick(button.url)}
+                      className="hover:text-gray-800"
+                    >
+                      {button.text}
+                    </button>
+                  </React.Fragment>
+                ))}
             </div>
           </div>
         </div>
