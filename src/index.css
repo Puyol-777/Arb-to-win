@@ -2,10 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-.forest-title {
-  font-family: 'Fredoka', cursive;
-  font-weight: 700;
-  color: #1F2937;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-  letter-spacing: 0.5px;
+@layer base {
+  :root {
+    --primary-color: #2563eb;
+    --secondary-color: #4b5563;
+    --accent-color: #10b981;
+    --bg-color: #f9fafb;
+    --text-color: #1f2937;
+  }
+
+  .dark {
+    --primary-color: #3b82f6;
+    --secondary-color: #9ca3af;
+    --accent-color: #34d399;
+    --bg-color: #1f2937;
+    --text-color: #f3f4f6;
+  }
+
+  .forest-title {
+    font-family: 'Fredoka', cursive;
+    font-weight: 700;
+    color: #1f2937;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.5px;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white px-4 py-2 rounded-full font-semibold transition-colors duration-200 hover:bg-accent;
+  }
 }

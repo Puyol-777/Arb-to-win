@@ -122,21 +122,21 @@ export function WheelCanvas({ prizes, rotation, size }: WheelCanvasProps) {
         ref={canvasRef}
         width={size}
         height={size}
-        style={{ 
-          transform: `rotate(${rotation}deg)`,
-          transition: rotation > 0 ? 'transform 3.5s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none'
-        }}
-        className="drop-shadow-lg"
+        style={{ '--rotation': `${rotation}deg` }}
+        className={`drop-shadow-lg [transform:rotate(var(--rotation))] ${
+          rotation > 0
+            ? 'transition-transform duration-[3500ms] [transition-timing-function:cubic-bezier(0.17,0.67,0.12,0.99)]'
+            : ''
+        }`}
       />
       
       {/* Pointeur en haut */}
       <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-3 z-10">
         <div className="flex flex-col items-center">
-          <div 
-            className="w-0 h-0 border-l-[15px] border-r-[15px] border-t-[25px] border-transparent border-t-red-600"
-            style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.7))' }}
+          <div
+            className="w-0 h-0 border-l-[15px] border-r-[15px] border-t-[25px] border-transparent border-t-red-600 drop-shadow-[0_3px_6px_rgba(0,0,0,0.7)]"
           />
-          <div className="w-0.5 h-3 bg-red-600 mt-0.5" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.5))' }}></div>
+          <div className="w-0.5 h-3 bg-red-600 mt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"></div>
         </div>
       </div>
     </div>

@@ -61,12 +61,12 @@ export function PrizeModal({ prize, texts, gameSettings, onClose, onReviewClick 
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 text-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fadeIn">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 text-center">
         <div className="mb-6">
-          <div 
-            className="w-24 h-24 mx-auto rounded-full flex items-center justify-center text-4xl mb-4"
-            style={{ backgroundColor: prize.color }}
+          <div
+            style={{ '--prize-color': prize.color }}
+            className="w-24 h-24 mx-auto rounded-full flex items-center justify-center text-4xl mb-4 bg-[var(--prize-color)]"
           >
             {prize.icon}
           </div>
@@ -74,13 +74,13 @@ export function PrizeModal({ prize, texts, gameSettings, onClose, onReviewClick 
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
           </h2>
           
-          <h2 
-            className="font-bold mb-2"
+          <h2
             style={{
-              fontFamily: texts.congratulationsFont,
-              fontSize: `${texts.congratulationsSize}px`,
-              color: texts.congratulationsColor
+              '--congrats-font': texts.congratulationsFont,
+              '--congrats-size': `${texts.congratulationsSize}px`,
+              '--congrats-color': texts.congratulationsColor
             }}
+            className="font-bold mb-2 font-[var(--congrats-font)] text-[length:var(--congrats-size)] text-[var(--congrats-color)]"
           >
             {texts.congratulations}
           </h2>
@@ -109,12 +109,12 @@ export function PrizeModal({ prize, texts, gameSettings, onClose, onReviewClick 
                 }
               }}
               style={{
-                backgroundColor: button.backgroundColor,
-                color: button.color
+                '--btn-bg': button.backgroundColor,
+                '--btn-color': button.color
               }}
-              className={`w-full rounded-xl font-semibold transition-colors hover:opacity-90 ${
-                button.id === 'google-review' 
-                  ? 'py-4 flex flex-col items-center justify-center space-y-2' 
+              className={`w-full rounded-xl font-semibold transition-colors hover:opacity-90 bg-[var(--btn-bg)] text-[var(--btn-color)] ${
+                button.id === 'google-review'
+                  ? 'py-4 flex flex-col items-center justify-center space-y-2'
                   : 'py-3'
               }`}
             >

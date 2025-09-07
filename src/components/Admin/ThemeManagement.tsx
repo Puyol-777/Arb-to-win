@@ -45,7 +45,7 @@ export function ThemeManagement({ themes, activeTheme, onUpdateThemes, onSetActi
         <h3 className="text-xl font-bold">Gestion des Thèmes</h3>
         <button
           onClick={handleAddTheme}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+          className="btn-primary"
         >
           Nouveau thème
         </button>
@@ -66,7 +66,7 @@ export function ThemeManagement({ themes, activeTheme, onUpdateThemes, onSetActi
 
       <div className="grid gap-4 md:grid-cols-2">
         {themes.map((theme) => (
-          <div key={theme.id} className="bg-white border border-gray-200 rounded-lg p-4">
+          <div key={theme.id} className="bg-white dark:bg-gray-800 border border-gray-200 rounded-lg p-4">
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h4 className="font-semibold text-lg">{theme.name}</h4>
@@ -97,25 +97,25 @@ export function ThemeManagement({ themes, activeTheme, onUpdateThemes, onSetActi
             
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
-                <div 
-                  className="w-6 h-6 rounded border"
-                  style={{ backgroundColor: theme.primaryColor }}
+                <div
+                  style={{ '--color': theme.primaryColor }}
+                  className="w-6 h-6 rounded border bg-[var(--color)]"
                 />
                 <span className="text-sm">Primaire: {theme.primaryColor}</span>
               </div>
               
               <div className="flex items-center space-x-2">
-                <div 
-                  className="w-6 h-6 rounded border"
-                  style={{ backgroundColor: theme.secondaryColor }}
+                <div
+                  style={{ '--color': theme.secondaryColor }}
+                  className="w-6 h-6 rounded border bg-[var(--color)]"
                 />
                 <span className="text-sm">Secondaire: {theme.secondaryColor}</span>
               </div>
               
               <div className="flex items-center space-x-2">
-                <div 
-                  className="w-6 h-6 rounded border"
-                  style={{ backgroundColor: theme.accentColor }}
+                <div
+                  style={{ '--color': theme.accentColor }}
+                  className="w-6 h-6 rounded border bg-[var(--color)]"
                 />
                 <span className="text-sm">Accent: {theme.accentColor}</span>
               </div>
@@ -126,7 +126,7 @@ export function ThemeManagement({ themes, activeTheme, onUpdateThemes, onSetActi
 
       {editingTheme && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-96 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md max-h-96 overflow-y-auto">
             <h4 className="text-lg font-semibold mb-4">Modifier le thème</h4>
             
             <div className="space-y-4">

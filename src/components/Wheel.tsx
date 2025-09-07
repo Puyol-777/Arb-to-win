@@ -100,22 +100,23 @@ export function Wheel({ prizes, texts, gameSettings, onResult, onStatsUpdate }: 
   return (
     <div className="flex flex-col items-center space-y-8 p-6">
       <div className="text-center space-y-2">
-        <h1 
-          className="font-bold forest-title"
+        <h1
           style={{
-            fontFamily: texts.titleFont,
-            fontSize: `${texts.titleSize}px`,
-            color: texts.titleColor
+            '--title-font': texts.titleFont,
+            '--title-size': `${texts.titleSize}px`,
+            '--title-color': texts.titleColor
           }}
+          className="font-bold forest-title font-[var(--title-font)] text-[length:var(--title-size)] text-[var(--title-color)]"
         >
           {texts.title}
         </h1>
-        <p 
+        <p
           style={{
-            fontFamily: texts.subtitleFont,
-            fontSize: `${texts.subtitleSize}px`,
-            color: texts.subtitleColor
+            '--subtitle-font': texts.subtitleFont,
+            '--subtitle-size': `${texts.subtitleSize}px`,
+            '--subtitle-color': texts.subtitleColor
           }}
+          className="font-[var(--subtitle-font)] text-[length:var(--subtitle-size)] text-[var(--subtitle-color)]"
         >
           {texts.subtitle}
         </p>
@@ -140,12 +141,13 @@ export function Wheel({ prizes, texts, gameSettings, onResult, onStatsUpdate }: 
           onClick={handleSpin}
           disabled={isSpinning || !canPlay}
           style={{
-            fontFamily: texts.spinButtonFont,
-            fontSize: `${texts.spinButtonSize}px`,
-            color: texts.spinButtonColor
+            '--spin-font': texts.spinButtonFont,
+            '--spin-size': `${texts.spinButtonSize}px`,
+            '--spin-color': texts.spinButtonColor
           }}
           className={`
             px-8 py-4 rounded-full font-bold transition-all duration-200
+            font-[var(--spin-font)] text-[length:var(--spin-size)] text-[var(--spin-color)]
             ${isSpinning || !canPlay
               ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
               : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 active:scale-95'
@@ -163,10 +165,10 @@ export function Wheel({ prizes, texts, gameSettings, onResult, onStatsUpdate }: 
                 key={button.id}
                 onClick={() => handleActionButtonClick(button.url)}
                 style={{
-                  backgroundColor: button.backgroundColor,
-                  color: button.color
+                  '--btn-bg': button.backgroundColor,
+                  '--btn-color': button.color
                 }}
-                className="px-4 py-2 rounded-full font-medium transition-colors hover:opacity-90"
+                className="px-4 py-2 rounded-full font-medium transition-colors hover:opacity-90 bg-[var(--btn-bg)] text-[var(--btn-color)]"
               >
                 {button.text}
               </button>
