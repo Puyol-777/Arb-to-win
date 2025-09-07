@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Menu, X, Settings as SettingsIcon } from 'lucide-react';
 import { Wheel } from './components/Wheel';
 import { Rules } from './components/Rules';
@@ -16,7 +16,7 @@ type ViewType = 'game' | 'rules' | 'legal' | 'admin';
 
 function App() {
   const [config, setConfig] = useState<AppConfig>(getStoredConfig());
-  const [configVersion, setConfigVersion] = useState(0);
+  const [, setConfigVersion] = useState(0);
   const [currentView, setCurrentView] = useState<ViewType>('game');
   const [menuOpen, setMenuOpen] = useState(false);
   const [winningPrize, setWinningPrize] = useState<Prize | null>(null);
@@ -24,9 +24,10 @@ function App() {
   const statsManager = StatsManager.getInstance();
 
   const activeTheme = config.themes.find(t => t.id === config.activeTheme);
+  const configRef = useRef(config);
 
   useEffect(() => {
-    saveConfig(config);
+    configRef.current = config;
   }, [config]);
 
   // Écouter les changements de configuration
@@ -35,6 +36,7 @@ function App() {
       console.log('🔄 Configuration update detected');
       const newConfig = getStoredConfig();
       setConfig(newConfig);
+      configRef.current = newConfig;
       setConfigVersion(prev => prev + 1);
       
       // Forcer le re-render des composants
@@ -65,7 +67,7 @@ function App() {
       cloudSync.forceSync();
     };
 
-    const handleConfigChanged = (e: CustomEvent) => {
+    const handleConfigChanged = () => {
       console.log('🔄 Config changed event triggered');
       handleConfigUpdate();
     };
@@ -73,9 +75,9 @@ function App() {
     // Vérifier périodiquement les changements (pour mobile)
     const checkInterval = setInterval(() => {
       const currentConfig = getStoredConfig();
-      const currentVersion = (currentConfig as any)._version || 0;
-      const appVersion = (config as any)._version || 0;
-      
+      const currentVersion = (currentConfig as { _version?: number })._version || 0;
+      const appVersion = (configRef.current as { _version?: number })._version || 0;
+
       if (currentVersion > appVersion) {
         console.log('🔄 Configuration mise à jour détectée, rechargement...');
         handleConfigUpdate();
@@ -100,7 +102,7 @@ function App() {
       window.removeEventListener('focus', handleConfigUpdate);
       window.removeEventListener('visibilitychange', handleConfigUpdate);
     };
-  }, [config]);
+  }, []);
 
   useEffect(() => {
     if (activeTheme) {
@@ -155,6 +157,7 @@ function App() {
     try {
       console.log('💾 Saving configuration...');
       setConfig(newConfig);
+      configRef.current = newConfig;
       saveConfig(newConfig);
       console.log('✅ Configuration saved successfully');
       
