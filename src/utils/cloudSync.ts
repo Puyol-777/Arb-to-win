@@ -1,13 +1,11 @@
 // Système de synchronisation cloud simple
+import logger from './logger';
 interface CloudConfig {
   id: string;
-  config: any;
+  config: unknown;
   timestamp: number;
   version: number;
 }
-
-const CLOUD_STORAGE_KEY = 'roue_cloud_config';
-const SYNC_ENDPOINT = 'https://api.jsonbin.io/v3/b'; // Service gratuit pour demo
 
 export class CloudSyncManager {
   private syncInterval: number | null = null;
@@ -35,7 +33,7 @@ export class CloudSyncManager {
   startSync() {
     if (this.syncInterval) return;
     
-    console.log('🌐 Démarrage de la synchronisation cloud');
+    logger.log('🌐 Démarrage de la synchronisation cloud');
     
     // Synchroniser immédiatement
     this.syncFromCloud();
@@ -50,13 +48,13 @@ export class CloudSyncManager {
     if (this.syncInterval) {
       clearInterval(this.syncInterval);
       this.syncInterval = null;
-      console.log('🌐 Arrêt de la synchronisation cloud');
+      logger.log('🌐 Arrêt de la synchronisation cloud');
     }
   }
 
-  async saveToCloud(config: any): Promise<boolean> {
+    async saveToCloud(config: unknown): Promise<boolean> {
     if (!this.isOnline) {
-      console.log('📱 Hors ligne - sauvegarde locale uniquement');
+      logger.log('📱 Hors ligne - sauvegarde locale uniquement');
       return false;
     }
 
@@ -78,11 +76,11 @@ export class CloudSyncManager {
       // Déclencher un événement pour notifier les autres onglets
       localStorage.setItem('cloud_sync_trigger', Date.now().toString());
       
-      console.log('☁️ Configuration sauvegardée dans le cloud');
+      logger.log('☁️ Configuration sauvegardée dans le cloud');
       return true;
       
     } catch (error) {
-      console.error('❌ Erreur sauvegarde cloud:', error);
+      logger.error('❌ Erreur sauvegarde cloud:', error);
       return false;
     }
   }
@@ -95,7 +93,7 @@ export class CloudSyncManager {
       const cloudData = sessionStorage.getItem('shared_roue_config');
       
       if (!cloudData) {
-        console.log('☁️ Aucune configuration cloud trouvée');
+        logger.log('☁️ Aucune configuration cloud trouvée');
         return false;
       }
 
@@ -115,7 +113,7 @@ export class CloudSyncManager {
       }
 
       if (shouldUpdate && cloudConfig.timestamp > this.lastSyncTime) {
-        console.log('☁️ Mise à jour depuis le cloud détectée');
+        logger.log('☁️ Mise à jour depuis le cloud détectée');
         
         // Sauvegarder la nouvelle configuration localement
         const configWithMeta = {
@@ -139,21 +137,21 @@ export class CloudSyncManager {
         
         this.lastSyncTime = cloudConfig.timestamp;
         
-        console.log('✅ Configuration mise à jour depuis le cloud');
+        logger.log('✅ Configuration mise à jour depuis le cloud');
         return true;
       }
       
       return false;
       
     } catch (error) {
-      console.error('❌ Erreur synchronisation cloud:', error);
+      logger.error('❌ Erreur synchronisation cloud:', error);
       return false;
     }
   }
 
   // Méthode pour forcer une synchronisation
   async forcSync(): Promise<void> {
-    console.log('🔄 Synchronisation forcée...');
+    logger.log('🔄 Synchronisation forcée...');
     await this.syncFromCloud();
   }
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Prize } from '../types';
+import logger from '../utils/logger';
 
 interface WheelCanvasProps {
   prizes: Prize[];
@@ -26,8 +27,8 @@ export function WheelCanvas({ prizes, rotation, size }: WheelCanvasProps) {
 
     const anglePerSegment = (2 * Math.PI) / prizes.length;
     
-    console.log('🎨 === DESSIN DE LA ROUE ===');
-    console.log(`📐 Angle par segment: ${(anglePerSegment * 180/Math.PI).toFixed(1)}°`);
+    logger.log('🎨 === DESSIN DE LA ROUE ===');
+    logger.log(`📐 Angle par segment: ${(anglePerSegment * 180/Math.PI).toFixed(1)}°`);
     
     // Dessiner les segments en commençant par le haut (0°) et en allant dans le sens horaire
     prizes.forEach((prize, index) => {
@@ -39,7 +40,7 @@ export function WheelCanvas({ prizes, rotation, size }: WheelCanvasProps) {
       const endDegrees = (endAngle * 180/Math.PI).toFixed(1);
       const centerDegrees = ((startAngle + anglePerSegment/2) * 180/Math.PI).toFixed(1);
       
-      console.log(`🎨 Segment ${index} "${prize.label}": ${startDegrees}° → ${endDegrees}° (centre: ${centerDegrees}°)`);
+      logger.log(`🎨 Segment ${index} "${prize.label}": ${startDegrees}° → ${endDegrees}° (centre: ${centerDegrees}°)`);
       
       // Dessiner le segment
       ctx.beginPath();
@@ -78,7 +79,7 @@ export function WheelCanvas({ prizes, rotation, size }: WheelCanvasProps) {
       
       // Gérer le texte long
       const maxWidth = 80;
-      let lines = [];
+        const lines: string[] = [];
       let currentLine = '';
       
       words.forEach(word => {

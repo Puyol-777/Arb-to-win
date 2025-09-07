@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Prize, AppTexts, GameSettings } from '../types';
-import { Gift, Star, Share2 } from 'lucide-react';
+import logger from '../utils/logger';
 
 interface PrizeModalProps {
   prize: Prize;
@@ -11,17 +11,17 @@ interface PrizeModalProps {
 }
 
 export function PrizeModal({ prize, texts, gameSettings, onClose, onReviewClick }: PrizeModalProps) {
-  console.log('🎯 PrizeModal - URLs actuelles:', {
+  logger.log('🎯 PrizeModal - URLs actuelles:', {
     googleReviewUrl: gameSettings.googleReviewUrl,
     actionButtons: texts.actionButtons.map(btn => ({ id: btn.id, url: btn.url }))
   });
 
   // Force re-render when config changes
-  const [configVersion, setConfigVersion] = useState(0);
+  const [, setConfigVersion] = useState(0);
   
   useEffect(() => {
     const handleConfigUpdate = () => {
-      console.log('🎯 PrizeModal: Config update detected');
+      logger.log('🎯 PrizeModal: Config update detected');
       setConfigVersion(prev => prev + 1);
     };
 
@@ -35,30 +35,6 @@ export function PrizeModal({ prize, texts, gameSettings, onClose, onReviewClick 
       window.removeEventListener('forceConfigReload', handleConfigUpdate);
     };
   }, []);
-
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `${texts.congratulations} J'ai gagné: ${prize.label}`,
-          text: `Je viens de gagner "${prize.label}" chez Arb' Aventure !`,
-          url: window.location.href
-        });
-      } catch (error) {
-        // Fallback to copying to clipboard
-        copyToClipboard();
-      }
-    } else {
-      copyToClipboard();
-    }
-  };
-
-  const copyToClipboard = () => {
-    const text = `Je viens de gagner "${prize.label}" chez Arb' Aventure ! ${window.location.href}`;
-    navigator.clipboard.writeText(text).then(() => {
-      alert('Lien copié dans le presse-papier !');
-    });
-  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fadeIn">
@@ -101,10 +77,10 @@ export function PrizeModal({ prize, texts, gameSettings, onClose, onReviewClick 
               key={button.id}
               onClick={() => {
                 if (button.id === 'google-review') {
-                  console.log('🎯 Clic Google Review - URL utilisée:', gameSettings.googleReviewUrl);
+                  logger.log('🎯 Clic Google Review - URL utilisée:', gameSettings.googleReviewUrl);
                   onReviewClick();
                 } else {
-                  console.log('🎯 Clic bouton action - URL utilisée:', button.url);
+                  logger.log('🎯 Clic bouton action - URL utilisée:', button.url);
                   window.open(button.url, '_blank');
                 }
               }}

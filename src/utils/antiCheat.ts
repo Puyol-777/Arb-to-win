@@ -1,4 +1,5 @@
 import { generateDeviceFingerprint, hashWithSalt } from './deviceFingerprint';
+import logger from './logger';
 
 const STORAGE_KEYS = {
   LAST_PLAY: 'roue_last_play',
@@ -27,11 +28,141 @@ export class AntiCheatSystem {
     
     return deviceId;
   }
-  
-  canPlay(playLimit: 'once' | 'daily'): { allowed: boolean; reason?: string };
-  canPlay(playLimit: 'once' | 'daily' | 'unlimited'): { allowed: boolean; reason?: string } {
+// ---- Types & Store abstractions ----
+export type PlayLimit = 'once' | 'daily' | 'unlimited';
+
+export interface CanPlayResult {
+  allowed: boolean;
+  reason?: string;
+}
+
+export interface KeyValueStore {
+  get(key: string): string | null;
+  set(key: string, value: string): void;
+  remove(key: string): void;
+}
+
+export class InMemoryStore implements KeyValueStore {
+  private map = new Map<string, string>();
+  get(key: string) { return this.map.get(key) ?? null; }
+  set(key: string, value: string) { this.map.set(key, value); }
+  remove(key: string) { this.map.delete(key); }
+}
+
+/** Optionnel : wrapper localStorage (navigateur) */
+export class LocalStorageStore implements KeyValueStore {
+  constructor(private prefix = 'playLimiter') {}
+  private k(key: string) { return `${this.prefix}:${key}`; }
+  get(key: string) { try { return window.localStorage.getItem(this.k(key)); } catch { return null; } }
+  set(key: string, value: string) { try { window.localStorage.setItem(this.k(key), value); } catch {} }
+  remove(key: string) { try { window.localStorage.removeItem(this.k(key)); } catch {} }
+}
+
+// ---- Utilitaire principal ----
+export class PlayLimiter {
+  private playedOnceKey: string;
+  private lastPlayedDateKey: string;
+
+  constructor(
+    /**
+     * baseKey identifie l'entité (ex: userId, équipe, appareil, scénario de jeu, etc.)
+     * Combinez-le si besoin (ex: `${userId}:${scenarioId}`)
+     */
+    private baseKey: string,
+    private store: KeyValueStore = new InMemoryStore()
+  ) {
+    this.playedOnceKey = `${this.baseKey}:playedOnce`;
+    this.lastPlayedDateKey = `${this.baseKey}:lastPlayedDate`;
+  }
+
+  // --- Surcharges ---
+  canPlay(playLimit: 'once' | 'daily'): CanPlayResult;
+  canPlay(playLimit: 'once' | 'daily' | 'unlimited'): CanPlayResult {
     if (playLimit === 'unlimited') {
       return { allowed: true };
+    }
+
+    if (playLimit === 'once') {
+      const played = this.store.get(this.playedOnceKey) === 'true';
+      if (played) {
+        return { allowed: false, reason: 'Limite "once" atteinte : déjà joué.' };
+      }
+      return { allowed: true };
+    }
+
+    // 'daily'
+    const lastPlayedDate = this.store.get(this.lastPlayedDateKey);
+    const today = this.todayLocalISO(); // ex: "2025-09-07"
+    if (lastPlayedDate === today) {
+      return { allowed: false, reason: 'Limite "daily" atteinte : déjà joué aujourd’hui.' };
+    }
+    return { allowed: true };
+  }
+
+  /**
+   * À appeler lorsque la partie démarre, pour poser l’état.
+   * Idempotent côté "once" (pose le flag), "daily" (pose la date du jour).
+   */
+  recordPlay(): void {
+    this.store.set(this.playedOnceKey, 'true');
+    this.store.set(this.lastPlayedDateKey, this.todayLocalISO());
+  }
+
+  /**
+   * Pratique : vérifie et enregistre en un seul appel.
+   */
+  checkAndRecord(playLimit: PlayLimit): CanPlayResult {
+    const res = this.canPlay(playLimit);
+    if (res.allowed) {
+      this.recordPlay();
+    }
+    return res;
+  }
+
+  /** Outils */
+  reset(): void {
+    this.store.remove(this.playedOnceKey);
+    this.store.remove(this.lastPlayedDateKey);
+  }
+
+  /**
+   * Retourne la date locale au format YYYY-MM-DD (jour civil, reset à minuit local)
+   */
+  private todayLocalISO(): string {
+    // Utilise le fuseau local de l'environnement JS
+    const now = new Date();
+    // Format ISO court sans heure : "YYYY-MM-DD"
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+}
+
+// ---- Exemples d’utilisation ----
+
+// Exemple 1 : par utilisateur + scénario, avec InMemoryStore
+const memoryStore = new InMemoryStore();
+const limiterUser42ScenarioA = new PlayLimiter('user:42:scenario:A', memoryStore);
+
+const check1 = limiterUser42ScenarioA.canPlay('once');
+// -> { allowed: true }
+if (check1.allowed) {
+  limiterUser42ScenarioA.recordPlay();
+}
+// Un 2e essai "once" renverra false
+const check2 = limiterUser42ScenarioA.canPlay('once');
+// -> { allowed: false, reason: 'Limite "once" atteinte : déjà joué.' }
+
+// Exemple 2 : "daily" avec enregistrement atomique
+const limiterDaily = new PlayLimiter('team:blue:quiz:daily', memoryStore);
+const attempt = limiterDaily.checkAndRecord('daily');
+// -> Si première fois du jour: { allowed: true } et l’état est posé automatiquement
+// -> Sinon : { allowed: false, reason: 'Limite "daily"...' }
+
+// Exemple 3 (navigateur) : persistance locale
+// const limiterBrowser = new PlayLimiter('user:42:scenario:A', new LocalStorageStore('myApp'));
+
     }
     
     const lastPlay = localStorage.getItem(STORAGE_KEYS.LAST_PLAY);
@@ -76,9 +207,9 @@ export class AntiCheatSystem {
     });
   }
   
-  private async logToServer(data: any): Promise<void> {
+    private async logToServer(data: Record<string, unknown>): Promise<void> {
     // In a real implementation, this would send to your backend
-    console.log('Logging play to server:', data);
+    logger.log('Logging play to server:', data);
   }
   
   resetDevice(): void {

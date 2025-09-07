@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { GameStats } from '../../types';
 import { Download, RotateCcw, TrendingUp, Calendar, BarChart3 } from 'lucide-react';
 import { StatsManager } from '../../utils/statsManager';
+import logger from '../../utils/logger';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -47,9 +48,9 @@ export function Statistics({ stats, onReset, onExport }: StatisticsProps) {
   const chartData = useMemo(() => {
     const data = statsManager.getDataForPeriod(stats.dailyHistory, selectedPeriod);
     
-    console.log('📊 Chart data:', data);
-    console.log('📊 Selected period:', selectedPeriod);
-    console.log('📊 Labels count:', data.labels.length);
+    logger.log('📊 Chart data:', data);
+    logger.log('📊 Selected period:', selectedPeriod);
+    logger.log('📊 Labels count:', data.labels.length);
     
     return {
       labels: data.labels,
