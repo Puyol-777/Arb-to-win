@@ -78,7 +78,7 @@ export function GainsManagement({ prizes, onUpdatePrizes }: GainsManagementProps
           </button>
           <button
             onClick={handleAddPrize}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+            className="btn-primary"
           >
             Ajouter un prix
           </button>
@@ -96,12 +96,12 @@ export function GainsManagement({ prizes, onUpdatePrizes }: GainsManagementProps
 
       <div className="grid gap-4">
         {prizes.map((prize) => (
-          <div key={prize.id} className="bg-white border border-gray-200 rounded-lg p-4">
+          <div key={prize.id} className="bg-white dark:bg-gray-800 border border-gray-200 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div 
-                  className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-                  style={{ backgroundColor: prize.color }}
+                <div
+                  style={{ '--prize-color': prize.color }}
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-2xl bg-[var(--prize-color)]"
                 >
                   {prize.icon}
                 </div>
@@ -151,7 +151,7 @@ export function GainsManagement({ prizes, onUpdatePrizes }: GainsManagementProps
 
       {editingPrize && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
             <h4 className="text-lg font-semibold mb-4">Modifier le prix</h4>
             
             <div className="space-y-4">

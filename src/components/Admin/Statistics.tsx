@@ -274,7 +274,7 @@ export function Statistics({ stats, onReset, onExport }: StatisticsProps) {
 
       {/* Statistiques du jour */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <div className="bg-white p-6 rounded-lg shadow border">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border">
           <div className="text-2xl font-bold text-blue-600">{stats.totalSpins}</div>
           <div className="text-gray-600">Spins totaux</div>
           <div className="text-sm text-gray-500 mt-1">
@@ -282,7 +282,7 @@ export function Statistics({ stats, onReset, onExport }: StatisticsProps) {
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow border">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border">
           <div className="text-2xl font-bold text-green-600">{stats.dailySpins}</div>
           <div className="text-gray-600">Spins aujourd'hui</div>
           <div className="text-sm text-gray-500 mt-1">
@@ -290,7 +290,7 @@ export function Statistics({ stats, onReset, onExport }: StatisticsProps) {
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow border">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border">
           <div className="text-2xl font-bold text-purple-600">{stats.reviewClicks}</div>
           <div className="text-gray-600">Clics avis Google</div>
           <div className="text-sm text-gray-500 mt-1">
@@ -298,7 +298,7 @@ export function Statistics({ stats, onReset, onExport }: StatisticsProps) {
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow border">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border">
           <div className="text-2xl font-bold text-orange-600">
             {todayStats?.conversionRate || 0}%
           </div>
@@ -310,7 +310,7 @@ export function Statistics({ stats, onReset, onExport }: StatisticsProps) {
       </div>
 
       {/* Contrôles du graphique */}
-      <div className="bg-white p-4 rounded-lg shadow border">
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
@@ -371,7 +371,7 @@ export function Statistics({ stats, onReset, onExport }: StatisticsProps) {
       </div>
 
       {/* Graphique principal */}
-      <div className="bg-white p-6 rounded-lg shadow border">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border">
         <div className="h-96">
           {chartType === 'line' ? (
             <Line data={chartData} options={chartOptions} />
@@ -382,7 +382,7 @@ export function Statistics({ stats, onReset, onExport }: StatisticsProps) {
       </div>
 
       {/* Distribution des gains */}
-      <div className="bg-white p-6 rounded-lg shadow border">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border">
         <h4 className="text-lg font-semibold mb-4">Distribution des gains</h4>
         {Object.keys(stats.prizeDistribution).length === 0 ? (
           <p className="text-gray-500">Aucune donnée disponible</p>
@@ -393,11 +393,9 @@ export function Statistics({ stats, onReset, onExport }: StatisticsProps) {
                 <span className="text-gray-700">{prize}</span>
                 <div className="flex items-center space-x-3">
                   <div className="bg-gray-200 rounded-full h-2 w-32">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full"
-                      style={{ 
-                        width: `${stats.totalSpins > 0 ? (count / stats.totalSpins) * 100 : 0}%` 
-                      }}
+                    <div
+                      style={{ '--progress': `${stats.totalSpins > 0 ? (count / stats.totalSpins) * 100 : 0}%` }}
+                      className="bg-blue-500 h-2 rounded-full w-[var(--progress)]"
                     />
                   </div>
                   <span className="text-sm text-gray-600 w-12 text-right">
@@ -411,7 +409,7 @@ export function Statistics({ stats, onReset, onExport }: StatisticsProps) {
       </div>
 
       {/* Informations */}
-      <div className="bg-white p-6 rounded-lg shadow border">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border">
         <h4 className="text-lg font-semibold mb-2">Informations</h4>
         <div className="text-sm text-gray-600 space-y-1">
           <p>Dernière remise à zéro: {new Date(stats.lastReset).toLocaleDateString('fr-FR')}</p>

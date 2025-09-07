@@ -204,7 +204,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: activeTheme?.backgroundColor }}>
+    <div className="min-h-screen bg-background text-text">
       {/* Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
